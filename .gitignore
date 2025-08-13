@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Model files
+arecanut_model.h5
+*.h5
+*.hdf5
+*.pb
+
+# Temp uploads
+temp/
+uploads/
+
+# Logs
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Render / build cache
+.cache/
+
+
