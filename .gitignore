@@ -16,8 +16,8 @@ env/
 Thumbs.db
 
 # Model files
-arecanut_model.h5
-*.h5
+# arecanut_model.h5
+# *.h5
 *.hdf5
 *.pb
 
