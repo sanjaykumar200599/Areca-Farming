@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify 
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
@@ -9,14 +9,13 @@ from disease_info import disease_recommendations
 app = Flask(__name__)
 model = tf.keras.models.load_model("arecanut_model.h5")
 
-# ✅ Make sure this matches EXACTLY with train_generator.class_indices
+# ✅ Must match train_generator.class_indices
 class_labels = [
     'BlackSpot_Fruit', 'Blackspot_Leaf', 'Blackspot_Stem',
     'Healthy_Hingara_1', 'Healthy_Hingara_2', 'Stem_bleeding',
     'anabe', 'black_pingara', 'healthy_fruit', 'healthy_leaf',
     'healthy_trunk', 'mite', 'mundu_siri', 'redpalm_weevil', 'scale_insect'
 ]
-
 
 @app.route('/')
 def home():
@@ -32,29 +31,40 @@ def predict():
     os.makedirs("temp", exist_ok=True)
     img_file.save(img_path)
 
-    # ✅ PREPROCESS EXACTLY LIKE COLAB
-    img = Image.open(img_path).convert("RGB")  # Ensure RGB
-    img = img.resize((224, 224))  # Same as IMAGE_SIZE in training
-    img_array = np.array(img) / 255.0  # Normalize like ImageDataGenerator
+    # ✅ Preprocess like training
+    img = Image.open(img_path).convert("RGB")
+    img = img.resize((224, 224))
+    img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
-    # ✅ PREDICT
+    # ✅ Predict
     preds = model.predict(img_array)
     predicted_index = np.argmax(preds)
     predicted_label = class_labels[predicted_index]
     confidence = float(np.max(preds)) * 100
 
+    # ✅ Confidence threshold check
+    THRESHOLD = 60.0  # change if needed
+    if confidence < THRESHOLD:
+        return jsonify({
+            "prediction": "Unknown image, please upload again",
+            "confidence": f"{confidence:.2f}%",
+            # "all_confidences": {class_labels[i]: float(preds[0][i]) * 100 for i in range(len(class_labels))},
+            "solution": "N/A",
+            "prevention": "N/A"
+        })
+
+    # ✅ If confident, return real prediction
     info = disease_recommendations.get(predicted_label, {"solution": "N/A", "prevention": "N/A"})
 
     return jsonify({
         "prediction": predicted_label,
         "confidence": f"{confidence:.2f}%",
+        # "all_confidences": {class_labels[i]: float(preds[0][i]) * 100 for i in range(len(class_labels))},
         "solution": info["solution"],
         "prevention": info["prevention"]
     })
 
-
-
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))  # Render will set PORT automatically
+    port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
