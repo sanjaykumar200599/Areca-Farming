@@ -1,2 +1,2 @@
 Major project updates.
-This only has backend information.
+This repo only has backend information.
