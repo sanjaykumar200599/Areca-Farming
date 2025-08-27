@@ -1,4 +1,4 @@
 Major project updates.
 This repo only has backend information.
-Model used is mobilenetv2.
+Current Model used is mobilenetv2.
 Upcoming model is EfficientNetB0
